@@ -1,0 +1,141 @@
+# NAME SURNAME ID KEREM KARABACAK 2644417
+# Instead of linear searching in cases, we can simply use jtab insturction. 
+# I am using a table which contains addresses of cases as a constant part of jtab.
+# Since every adress' size is 8 bytes, we need to add case * 8 to reach correct case.
+# This implementation resulted 27 CPE.
+# I changed the code more for more optimization.
+# To avoid more jumps, I changed the location of cases_over to top of loop, thus after we are falling through to loop directly instead of jumping.
+# To achieve this I added an additional jump at the start.
+# Also, to avoid jump in case7, I relocated it at top of cases_over.
+# Finally I take out some irmovq out of the loop, thus we are not repeating the same instruction over and over again.
+# This optimizations take me to ~23 CPE.
+# I believe there is more to optimize, but this is best I can do in this time. Have a good day!
+
+.pos 0x0
+	irmovq stack, %rsp  	# Set up stack pointer  
+    irmovq array_begin1, %rdi
+    irmovq array_begin2, %rsi
+    irmovq $16, %rdx
+    call switch8
+    halt
+
+#implement your code below (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+# %rdi -> begin1, %rsi -> begin2, %rdx -> length
+
+switch8:
+    irmovq $3, %r14
+    irmovq $8, %r12
+    irmovq $2, %r13
+    irmovq $10, %r9
+    jmp loop
+
+#7 -> divide by 3
+case7:
+dvvq %r14, %r11
+
+
+cases_over:
+    irmovq $16, %r10
+    addq %r10, %r11
+    rmmovq %r11, (%rsi)
+    irmovq $1, %r10
+    subq %r10, %rdx   			# length--
+    addq %r12, %rdi 			# begin1++
+    addq %r12, %rsi			# begin2++
+
+    
+loop:
+    andq %rdx, %rdx       		# checking length is zero or not
+    jle done:
+    
+    mrmovq (%rdi), %r8							
+    mrmovq (%rdi), %r11
+    modq %r12, %r8			# begin1 % 8
+    mllq %r12, %r8
+    jtab table, %r8
+    
+done:
+ret
+
+
+#0 -> add 1
+case0:
+irmovq $1, %r10
+addq %r10, %r11
+jmp cases_over
+
+#1 -> multiply by 5
+case1:
+irmovq $5, %r10
+mllq %r10, %r11
+jmp cases_over
+
+#2 -> divide by 2
+case2:
+dvvq %r13, %r11
+jmp cases_over
+
+#3 -> take mod 3
+case3:
+modq %r14, %r11
+jmp cases_over
+
+#4 -> subtract 7
+case4:
+irmovq $7, %r10
+subq %r10, %r11
+jmp cases_over
+
+#5 -> make it 331
+case5:
+irmovq $331, %r11
+jmp cases_over
+
+#6 -> add 10
+case6:
+addq %r9, %r11
+jmp cases_over
+
+
+
+table:
+.quad case0
+.quad case1
+.quad case2
+.quad case3
+.quad case4
+.quad case5
+.quad case6
+.quad case7
+
+#implement your code above (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+.pos 0x1008
+array_begin1:
+    .quad 0
+    .quad 1
+    .quad 2
+    .quad 3
+    .quad 4
+    .quad 5
+    .quad 6
+    .quad 7
+    .quad 8
+    .quad 9
+    .quad 10
+    .quad 11
+    .quad 12
+    .quad 13
+    .quad 14
+    .quad 15
+array_end1:
+    .quad 0
+.pos 0x1500
+array_begin2:
+    .quad 0
+.pos 0x1F00
+stack:
+    .quad 0
+
+

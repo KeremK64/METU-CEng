@@ -1,0 +1,103 @@
+# NAME SURNAME ID KEREM KARABACAK 2644417
+.pos 0x0
+init:
+    irmovq stack, %rsp
+    irmovq $6, %rdx
+    irmovq array_begin, %rdi
+    irmovq array_end, %rsi
+    call binary_search
+    halt
+
+#implement your code below (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+binary_search:
+    
+    # Params -> %rdi: begin, %rsi: end, %rdx: value
+    # Locals -> %rcx: mid, %r11: arr[mid], %r10: tmp, %rbx: begin
+    
+    rrmovq %rsi, %rcx 		# mid = end
+    subq %rdi, %rcx		# mid = end - begin
+    irmovq $16, %r11
+    dvvq %r11, %rcx   		# mid = (end - begin) / 2
+    irmovq $8, %r12
+    mllq %r12, %rcx
+    addq %rdi, %rcx		# mid = begin + ((end - begin) / 2)
+    rrmovq %rcx, %rax		# store mid in rax
+    
+base_case:
+    rrmovq %rdi, %rbx
+    rrmovq %rdi, %r11
+    rrmovq %rsi, %r10
+    subq %r10, %r11
+    jge baseCase
+    
+condition1:
+    mrmovq (%rax), %r11       # array[mid]
+    subq %rdx, %r11           # compare with value
+    je found
+    jl less
+    
+greater:
+    rrmovq %rax, %rsi         # change second argument with mid
+    call binary_search
+    jmp terminate
+
+less:
+    pushq %rcx                # push mid to stack
+    pushq %rbx                # push begin to stack 
+    irmovq $8, %r12           # pointer arithmetic + 8 
+    addq %r12, %rcx
+    rrmovq %rcx, %rdi         # change first argument with mid
+    call binary_search
+    popq %rbx
+    popq %rcx
+    irmovq $1, %r12
+    addq %rax, %r12     
+    jne temp                 # temp != -1
+    jmp terminate
+    
+temp:
+    irmovq $8, %r12          
+    mllq %r12, %rax         # pointer arithmetic 8 bytes
+    addq %rcx, %rax         # tmp + mid
+    subq %rbx, %rax         # tmp + mid - begin
+    irmovq $8, %r12
+    addq %r12, %rax         # tmp + mid - begin + 1
+    irmovq $8, %r12
+    dvvq %r12, %rax         # correct the result
+    jmp terminate
+
+found:
+    subq %rdi, %rax         # mid - begin
+    irmovq $8, %r12         # pointer arithmetic
+    addq %r12, %rax         # mid - begin + 1 
+    irmovq $8, %r12
+    dvvq %r12, %rax         # correct the result
+    jmp terminate
+     
+baseCase:
+    irmovq $-1, %rax
+    ret
+    
+terminate:
+    ret
+
+#implement your code above (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+.pos 0x1008
+array_begin:
+    .quad 1
+    .quad 2
+    .quad 3
+    .quad 5
+    .quad 6
+    .quad 7
+    .quad 9
+    .quad 11
+array_end:
+    .quad 0
+.pos 0x1F00
+stack:
+    .quad 0
+
+

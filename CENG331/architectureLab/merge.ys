@@ -1,0 +1,106 @@
+# NAME SURNAME ID KEREM KARABACAK 2644417
+.pos 0x0
+init:
+    irmovq stack, %rsp
+    irmovq array_begin1, %rdi
+    irmovq array_end1, %rsi
+    irmovq array_begin2, %rdx
+    irmovq array_end2, %rcx
+    irmovq array_begin3, %r8
+    call merge
+    halt
+
+#implement your code below (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+merge:
+    # Params -> %rdi: begin1, %rsi: end1, %rdx: begin2, %rcx: end2, %r8: begin3
+    
+loop1:
+    rrmovq %rsi, %r9
+    subq %rdi, %r9
+    jle loop2
+    rrmovq %rcx, %r9
+    subq %rdx, %r9
+    jle loop2
+    
+    mrmovq (%rdi), %r10
+    mrmovq (%rdx), %r11
+    subq %r10, %r11
+    jle else1
+    
+    mrmovq (%rdi), %r12
+    rmmovq %r12, (%r8)
+    irmovq $8, %r9
+    addq %r9, %rdi
+    addq %r9, %r8
+    jmp loop1
+    
+else1:
+    mrmovq (%rdx), %r13
+    rmmovq %r13, (%r8)
+    irmovq $8, %r9
+    addq %r9, %rdx
+    addq %r9, %r8
+    jmp loop1
+    
+loop2:
+    rrmovq %rsi, %r9
+    subq %rdi, %r9
+    jle loop3
+    
+    mrmovq (%rdi), %r12
+    rmmovq %r12, (%r8)
+    irmovq $8, %r9
+    addq %r9, %rdi
+    addq %r9, %r8
+    jmp loop2
+    
+loop3:
+    rrmovq %rcx, %r9
+    subq %rdx, %r9
+    jle terminate
+
+    mrmovq (%rdx), %r13
+    rmmovq %r13, (%r8)
+    irmovq $8, %r9
+    addq %r9, %rdx
+    addq %r9, %r8
+    jmp loop3
+    
+terminate:
+    ret
+    
+
+#implement your code above (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+.pos 0x1008
+array_begin1:
+    .quad 1
+    .quad 2
+    .quad 3
+    .quad 5
+    .quad 17
+    .quad 18
+    .quad 19
+    .quad 110
+array_end1:
+    .quad 0
+array_begin2:
+    .quad 10
+    .quad 11
+    .quad 12
+    .quad 200
+    .quad 201
+    .quad 202
+    .quad 203
+    .quad 204
+array_end2:
+    .quad 0
+.pos 0x1500
+array_begin3:
+    .quad 0
+.pos 0x1F00
+stack:
+    .quad 0
+
+

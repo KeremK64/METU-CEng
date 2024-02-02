@@ -1,0 +1,75 @@
+# NAME SURNAME ID KEREM KARABACAK 2644417
+.pos 0x0
+init:
+    irmovq stack, %rsp
+    irmovq $6, %rdx
+    irmovq array_begin, %rdi
+    irmovq array_end, %rsi
+    call binary_search
+    halt
+
+#implement your code below (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+binary_search:
+    # Params -> %rdi: begin, %rsi: end, %rdx: value
+    # Locals -> %rbx: initial begin, %rcx: mid, %r8: array[mid]
+    
+    irmovq $-1, %rax
+    rrmovq %rdi, %rbx 		# store begin in initial begin
+loop:
+    rrmovq %rsi, %r9          # Load end into %r9
+    subq %rdi, %r9		# while condition		
+    jle return			# return -1
+    rrmovq %rsi, %rcx 		# mid = end
+    subq %rdi, %rcx		# mid = end - begin
+    irmovq $16, %r11
+    dvvq %r11, %rcx   		# mid = (end - begin) / 2
+    irmovq $8, %r12
+    mllq %r12, %rcx
+    addq %rdi, %rcx		# mid = begin + ((end - begin) / 2)
+    mrmovq (%rcx), %r8		# get array[mid]
+    subq %rdx, %r8  		# compare value and array[mid]
+    je found_the_value
+    jl less
+    				# greater case
+    rrmovq %rcx, %rsi		# end = mid
+    jmp loop		
+    
+less:
+    irmovq $8, %r10
+    addq %r10, %rcx		# mid + 1
+    rrmovq %rcx, %rdi
+    jmp loop
+     
+found_the_value:
+
+    subq %rbx, %rcx
+    irmovq $8, %rax
+    addq %rax, %rcx
+    rrmovq %rcx, %rax
+    irmovq $8, %r13
+    dvvq %r13, %rax
+       
+return: 
+    
+    ret
+
+#implement your code above (DO NOT CHANGE/REMOVE THIS COMMENT)
+
+.pos 0x1008
+array_begin:
+    .quad 1
+    .quad 2
+    .quad 3
+    .quad 5
+    .quad 6
+    .quad 7
+    .quad 9
+    .quad 11
+array_end:
+    .quad 0
+.pos 0x1F00
+stack:
+    .quad 0
+
+
