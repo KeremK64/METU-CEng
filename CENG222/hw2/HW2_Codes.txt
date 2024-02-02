@@ -1,0 +1,63 @@
+Code for Q1:
+x = normrnd(175, 7, [1, 1000]);
+hist(x, 20)
+xlabel('Height (cm)')
+ylabel('Frequency')
+title('Histogram of Heights')
+
+-------------------------------------------------------------------------------------------------------------
+
+Code for Q2:
+sigmas = [6, 7, 8];
+sample = normrnd(175, sigmas(end), [1, 1000]);
+x_min = min(sample);
+x_max = max(sample);
+x = linspace(x_min, x_max, 1000);
+hold on
+for sigma = sigmas
+    y = normpdf(x, 175, sigma);
+    plot(x, y, 'LineWidth', 2, 'DisplayName', sprintf('\\sigma = %d', sigma));
+end
+hold off
+legend('Location', 'Northwest')
+xlabel('Height (cm)')
+ylabel('PDF')
+
+
+
+---------------------------------------------------------------------------------------------------------------
+
+
+Code for Q3: 
+
+
+count45 = 0;
+count50 = 0;
+count55 = 0;
+
+for i = 1:1000
+    count = 0;
+    x = normrnd(175, 7, [1, 150]);
+    for j = 1:150
+    if(x(j) >= 170 && x(j) <= 180) 
+            count = count + 1;
+        end
+    end
+    if count >= 150*0.45
+        count45 = count45 + 1;
+    end
+    if count >= 150*0.5
+        count50 = count50 + 1;
+    end
+    if count >= 150*0.55
+        count55 = count55 + 1;
+    end
+end
+
+prob45 = count45 / 1000 * 100;
+prob50 = count50 / 1000 * 100;
+prob55 = count55 / 1000 * 100;
+
+fprintf('Probability of at least 45%% of adults with heights between 170 cm and 180 cm: %.2f%%\n', prob45)
+fprintf('Probability of at least 50%% of adults with heights between 170 cm and 180 cm: %.2f%%\n', prob50)
+fprintf('Probability of at least 55%% of adults with heights between 170 cm and 180 cm: %.2f%%\n', prob55)
