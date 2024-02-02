@@ -1,0 +1,6 @@
+Correct text is Houses will begat jobs, jobs will begat houses.
+6 8 16 34 66 116
+3 202 1
+21 3
+ilnfkr 
+5 3 4 2 6 1
